@@ -13,6 +13,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("com.flickr4java:flickr4java:3.0.2")
+    implementation("commons-io:commons-io:2.6")
     testCompile("junit", "junit", "4.12")
 }
 
