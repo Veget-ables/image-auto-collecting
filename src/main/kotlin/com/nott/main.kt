@@ -105,11 +105,21 @@ class ImageAutoCollecting : CliktCommand() {
 
 
     override fun run() {
-        configProperties = importProperties(configPath)
-        val photos = collectPhotosWithQuery(searchQuery)
+        val flickr = setupFlickrClient()
+        val photos: PhotoList<Photo> = flickr.photosInterface.search(searchParameters, perPageParam, pageParam)
         photos.map {
             storePhoto(outputPath, it)
         }
+    }
+
+    private fun setupFlickrClient(): Flickr {
+        Flickr.debugRequest = true
+        Flickr.debugStream = true
+        val configProperties = importProperties(configPath)
+        val apiKey = configProperties.getProperty("API_KEY")
+        val secret = configProperties.getProperty("SECRET")
+
+        return Flickr(apiKey, secret, REST())
     }
 
     private fun importProperties(configPath: String): Properties {
@@ -117,21 +127,6 @@ class ImageAutoCollecting : CliktCommand() {
         return Properties().apply {
             load(content)
         }
-    }
-
-    private fun collectPhotosWithQuery(query: String): PhotoList<Photo> {
-        val apiKey = configProperties.getProperty("API_KEY")
-        val secret = configProperties.getProperty("SECRET")
-        val flickr = Flickr(apiKey, secret, REST())
-
-        val sp = SearchParameters().apply {
-            media = "photos"
-            extras = setOf("url_sq", "tags")
-            text = query
-            tagMode = "all"
-            sort = SearchParameters.RELEVANCE
-        }
-        return flickr.photosInterface.search(sp, 100, 1)
     }
 
     private fun storePhoto(outputPath: String, photo: Photo) {
