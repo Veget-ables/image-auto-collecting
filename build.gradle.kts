@@ -16,6 +16,7 @@ dependencies {
     implementation("com.flickr4java:flickr4java:3.0.2")
     implementation("com.github.ajalt:clikt:2.3.0")
     implementation("commons-io:commons-io:2.6")
+    implementation("org.slf4￿￿￿j:slf4j-log4j12:1.7.29")
 
     testCompile("junit", "junit", "4.12")
 }
