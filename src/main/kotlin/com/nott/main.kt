@@ -5,6 +5,7 @@ import com.flickr4java.flickr.REST
 import com.flickr4java.flickr.photos.Photo
 import com.flickr4java.flickr.photos.PhotoList
 import com.flickr4java.flickr.photos.SearchParameters
+import com.flickr4java.flickr.photos.Size
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.default
@@ -29,8 +30,8 @@ class ImageAutoCollecting : CliktCommand() {
             by option(
                 "-op",
                 "--outputPath",
-                help = "Default to './output/'. Specify the path to output the images."
-            ).default(value = "./output/")
+                help = "Default to './output'. Specify the path to output the images."
+            ).default(value = "./output")
 
     private val tagsParam: Array<String>?
             by option(
@@ -130,14 +131,44 @@ class ImageAutoCollecting : CliktCommand() {
     }
 
     private fun storePhoto(outputPath: String, photo: Photo) {
+        // extraによるurl指定が無かった場合
+        if (photo.sizes.filterNotNull().isEmpty()) {
+            val outputFilePath =
+                outputPath + "/" + "square" + "/" + photo.id + ".jpg"
+            storeFile(photo.squareLargeUrl, outputFilePath)
+            return
+        }
+
+        photo.sizes.filterNotNull().map {
+            val subDir = subDirectoryName(it.label)
+            val outputFilePath = outputPath + "/" + subDir + "/" + photo.id + "_h" + it.height + "_w" + it.width + ".jpg"
+            storeFile(it.source, outputFilePath)
+        }
+    }
+
+    private fun storeFile(url: String, outputFilePath: String) {
         try {
             FileUtils.copyURLToFile(
-                URL(photo.squareLargeUrl),
-                File(outputPath + photo.id + ".jpg")
+                URL(url),
+                File(outputFilePath)
             )
         } catch (e: IOException) {
             throw RuntimeException(e)
         }
+    }
+
+    private fun subDirectoryName(label: Int): String = when (label) {
+        Size.THUMB -> "ex_thumb"
+        Size.SQUARE -> "ex_square"
+        Size.SMALL -> "ex_small"
+        Size.MEDIUM -> "ex_medium"
+        Size.LARGE -> "ex_large"
+        Size.ORIGINAL -> "ex_original"
+        Size.SQUARE_LARGE -> "ex_square_large"
+        Size.SMALL_320 -> "ex_small_320"
+        Size.MEDIUM_640 -> "ex_medium_640"
+        Size.MEDIUM_800 -> "ex_medium_800"
+        else -> "ex_other"
     }
 }
 
