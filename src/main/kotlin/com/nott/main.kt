@@ -6,9 +6,10 @@ import com.flickr4java.flickr.photos.Photo
 import com.flickr4java.flickr.photos.PhotoList
 import com.flickr4java.flickr.photos.SearchParameters
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.int
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.io.IOException
@@ -17,23 +18,91 @@ import java.util.*
 
 class ImageAutoCollecting : CliktCommand() {
 
-    private lateinit var configProperties: Properties
-
     private val configPath: String
             by option(
                 "-cp",
                 "--configPath",
-                help = "Specify the path to config.properties. Default configPath is ./config.properties."
+                help = "Defaults to './config.properties'. Specify the path to config.properties."
             ).default(value = "./config.properties")
 
     private val outputPath: String
             by option(
                 "-op",
                 "--outputPath",
-                help = "Specify the path to output the images. Default outputPath is ./output/."
+                help = "Default to './output/'. Specify the path to output the images."
             ).default(value = "./output/")
 
-    private val searchQuery: String by argument(name = "<SearchQuery>", help = "ex. 'sea', or 'cat baby'")
+    private val tagsParam: Array<String>?
+            by option(
+                "-tg",
+                "--tags",
+                help = "A comma-delimited list of tags. Photos with one or more of the tags listed will be returned. You can exclude results that match a term by prepending it with a - character."
+            ).convert("") {
+                it.split(",").toTypedArray()
+            }
+
+    private val tagModeParam: String
+            by option(
+                "-tm",
+                "--tagMode",
+                help = "Defaults to 'any'. The possible values are: 'any' and 'all'"
+            ).default("any")
+
+    private val textParam: String?
+            by option(
+                "-t",
+                "--text",
+                help = "A free text search. Photos who's title, description or tags contain the text will be returned. You can exclude results that match a term by prepending it with a - character."
+            )
+
+    private val sortParam: Int
+            by option(
+                "-s",
+                "--sort",
+                help = "Defaults to 6 (relevance). The possible values are: 0 (date-posted-desc), 1 (date-posted-asc), 2 (date-taken-desc) 3 (date-taken-asc), 4 (interestingness-desc), 5 (interestingness-asc), and 6 (relevance)"
+            ).int().default(SearchParameters.RELEVANCE)
+
+    private val mediaParam: String
+            by option(
+                "-m",
+                "--media",
+                help = "Defaults to 'all'. The possible values are 'all', 'photos' and 'videos'"
+            ).default("all")
+
+    private val extrasParam: Set<String>?
+            by option(
+                "-ex",
+                "--extras",
+                help = "The possible values are: description, license, date_upload, date_taken, owner_name, icon_server, original_format, last_update, geo, tags, machine_tags, o_dims, views, media, path_alias, url_sq, url_t, url_s, url_q, url_m, url_n, url_z, url_c, url_l, url_o"
+            ).convert("") {
+                it.split(",").toSet()
+            }
+
+    private val searchParameters: SearchParameters by lazy {
+        SearchParameters().apply {
+            tags = tagsParam
+            tagMode = tagModeParam
+            extras = extrasParam
+            text = textParam
+            sort = sortParam
+            media = mediaParam
+        }
+    }
+
+    private val perPageParam: Int
+            by option(
+                "-pp",
+                "--perPage",
+                help = "Defaults to 100. The maximum allowed value is 500."
+            ).int().default(100)
+
+    private val pageParam: Int
+            by option(
+                "-p",
+                "--page",
+                help = "Defaults to 1. The page of results to return."
+            ).int().default(1)
+
 
     override fun run() {
         configProperties = importProperties(configPath)
