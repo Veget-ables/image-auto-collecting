@@ -25,7 +25,7 @@ SECRET = <取得したsecretの値>
 ### Options of Script
 実行時に指定するオプションは、以下のように `./runcollecting.sh --help` で確認することができる。
 ```shell script
-./runcollecting.sh --help
+./runcollecting.sh --help                                                                                                      4709ms  水 12/11 11:54:14 2019
 Usage: imageautocollecting [OPTIONS]
 
 Options:
@@ -39,16 +39,16 @@ Options:
                           with a - character.
   -tm, --tagMode TEXT     Defaults to 'any'. The possible values are: 'any'
                           and 'all'
-  -t, --text TEXT         A free text search. Photos who's title, description
+  -tx, --text TEXT        A free text search. Photos who's title, description
                           or tags contain the text will be returned. You can
                           exclude results that match a term by prepending it
                           with a - character.
-  -s, --sort INT          Defaults to 6 (relevance). The possible values are:
+  -st, --sort INT         Defaults to 6 (relevance). The possible values are:
                           0 (date-posted-desc), 1 (date-posted-asc), 2
                           (date-taken-desc) 3 (date-taken-asc), 4
                           (interestingness-desc), 5 (interestingness-asc), and
                           6 (relevance)
-  -m, --media TEXT        Defaults to 'all'. The possible values are 'all',
+  -md, --media TEXT       Defaults to 'all'. The possible values are 'all',
                           'photos' and 'videos'
   -ex, --extras           The possible values are: description, license,
                           date_upload, date_taken, owner_name, icon_server,
@@ -57,7 +57,7 @@ Options:
                           url_sq, url_t, url_s, url_q, url_m, url_n, url_z,
                           url_c, url_l, url_o
   -pp, --perPage INT      Defaults to 100. The maximum allowed value is 500.
-  -p, --page INT          Defaults to 1. The page of results to return.
+  -pg, --page INT         Defaults to 1. The page of results to return.
   -h, --help              Show this message and exit
 ```
 `-cp, --configPath` はconfig.propertiesの場所を指定する。省略すると `リポジトリのルートパス/config.properties` を探す。<br>
@@ -69,9 +69,15 @@ Argumentsとして定義されているリクエストパラメータに対応�
 スクリプト実行例
 ```shell script
 設定ファイルパスと出力先パスを指定して キーワード"cat" で実行
-./runcollecting.sh -cp=/Users/taro/Desktop/flickr/config.properties -op=/Users/taro/Desktop/flickr/output -t="cat" 
+./runcollecting.sh \ 
+        -cp=/Users/taro/Desktop/flickr/config.properties \
+        -op=/Users/taro/Desktop/flickr/output \
+        -tx="cat" 
 
 指定した画像サイズ毎に10個の画像をダウンロードするように実行
-./runcollecting.sh -t="cat" -ex="url_sq,url_t" -pp=10
+ ./runcollecting.sh \
+        -tx="cat baby" \
+        -ex="url_t,url_sq" \
+        -pp=10
 
 ```
