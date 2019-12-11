@@ -5,12 +5,12 @@ import com.flickr4java.flickr.REST
 import com.flickr4java.flickr.photos.Photo
 import com.flickr4java.flickr.photos.PhotoList
 import com.flickr4java.flickr.photos.SearchParameters
-import com.flickr4java.flickr.photos.Size
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
+import com.nott.extension.subDirectoryName
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.io.IOException
@@ -140,8 +140,8 @@ class ImageAutoCollecting : CliktCommand() {
         }
 
         photo.sizes.filterNotNull().map {
-            val subDir = subDirectoryName(it.label)
-            val outputFilePath = outputPath + "/" + subDir + "/" + photo.id + "_h" + it.height + "_w" + it.width + ".jpg"
+            val outputFilePath =
+                outputPath + "/" + it.subDirectoryName + "/" + photo.id + "_h" + it.height + "_w" + it.width + ".jpg"
             storeFile(it.source, outputFilePath)
         }
     }
@@ -155,20 +155,6 @@ class ImageAutoCollecting : CliktCommand() {
         } catch (e: IOException) {
             throw RuntimeException(e)
         }
-    }
-
-    private fun subDirectoryName(label: Int): String = when (label) {
-        Size.THUMB -> "ex_thumb"
-        Size.SQUARE -> "ex_square"
-        Size.SMALL -> "ex_small"
-        Size.MEDIUM -> "ex_medium"
-        Size.LARGE -> "ex_large"
-        Size.ORIGINAL -> "ex_original"
-        Size.SQUARE_LARGE -> "ex_square_large"
-        Size.SMALL_320 -> "ex_small_320"
-        Size.MEDIUM_640 -> "ex_medium_640"
-        Size.MEDIUM_800 -> "ex_medium_800"
-        else -> "ex_other"
     }
 }
 
