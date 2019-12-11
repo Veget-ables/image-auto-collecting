@@ -51,21 +51,21 @@ class ImageAutoCollecting : CliktCommand() {
 
     private val textParam: String?
             by option(
-                "-t",
+                "-tx",
                 "--text",
                 help = "A free text search. Photos who's title, description or tags contain the text will be returned. You can exclude results that match a term by prepending it with a - character."
             )
 
     private val sortParam: Int
             by option(
-                "-s",
+                "-st",
                 "--sort",
                 help = "Defaults to 6 (relevance). The possible values are: 0 (date-posted-desc), 1 (date-posted-asc), 2 (date-taken-desc) 3 (date-taken-asc), 4 (interestingness-desc), 5 (interestingness-asc), and 6 (relevance)"
             ).int().default(SearchParameters.RELEVANCE)
 
     private val mediaParam: String
             by option(
-                "-m",
+                "-md",
                 "--media",
                 help = "Defaults to 'all'. The possible values are 'all', 'photos' and 'videos'"
             ).default("all")
@@ -99,7 +99,7 @@ class ImageAutoCollecting : CliktCommand() {
 
     private val pageParam: Int
             by option(
-                "-p",
+                "-pg",
                 "--page",
                 help = "Defaults to 1. The page of results to return."
             ).int().default(1)
